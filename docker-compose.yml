@@ -1,0 +1,21 @@
+version: '3'
+services:
+  postgres:
+    container_name: 'telegram_pg'
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: '${DB_LOGIN}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD}'
+      POSTGRES_DB: '${DB_NAME}'
+    ports:
+      - '${DB_PORT}:${DB_PORT_SEC}'
+    command:
+      - '-p ${DB_PORT}'
+    volumes:
+      - telegram_db:/var/lib/postgresql/data
+    networks:
+      default:
+volumes:
+  telegram_db:
+
