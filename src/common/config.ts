@@ -23,7 +23,7 @@ export class Config {
   public getTypeOrmConfig(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      host: 'postgres',
+      host: this.get('DB_HOST', 'localhost'),
       port: this.get('DB_PORT', 5432),
       username: this.get('DB_LOGIN'),
       password: this.get('DB_PASSWORD'),

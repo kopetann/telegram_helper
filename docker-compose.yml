@@ -1,7 +1,7 @@
 version: '3'
 services:
   postgres:
-    container_name: 'telegram_pg'
+    container_name: telegram_pg
     image: postgres:15-alpine
     restart: unless-stopped
     environment:
