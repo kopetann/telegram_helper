@@ -1,7 +1,8 @@
-import { DataSource, DataSourceOptions } from 'typeorm';
-import { Config } from './config';
+import { DataSource } from 'typeorm';
+import { DatabaseConfig } from './database.config';
+import * as dotenv from 'dotenv';
 
-const conf = new Config();
+dotenv.config();
 export const dataSource = new DataSource(
-  <DataSourceOptions>conf.getTypeOrmConfig(),
+  new DatabaseConfig().createTypeOrmOptions(),
 );
