@@ -16,15 +16,16 @@ import { UpdateUserDto } from '../dto/update.user.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt.auth.guard';
 
 @Controller('user')
-@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('my')
   public getMyProfile(@Request() req: any) {
     return req.user;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   public getUserById(@Param('id') id: string): Promise<User> {
     return this.userService.findUserById(id);
@@ -35,11 +36,13 @@ export class UserController {
     return this.userService.createUser(createUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getUsers(): Promise<User[]> {
     return await this.userService.getUsers();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   public updateUser(
     @Param('id') id: string,
@@ -48,6 +51,7 @@ export class UserController {
     return this.userService.updateUser(id, updateUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   public deleteUser(@Param('id') id: string): Promise<boolean> {
     return this.userService.deleteUser(id);
