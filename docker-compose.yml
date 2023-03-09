@@ -1,8 +1,10 @@
-version: '3'
+version: '3.8'
+networks:
+  internal:
 services:
   postgres:
     container_name: telegram_pg
-    image: postgres:15-alpine
+    image: postgres:latest
     restart: unless-stopped
     environment:
       POSTGRES_USER: '${DB_LOGIN}'
@@ -15,7 +17,7 @@ services:
     volumes:
       - telegram_db:/var/lib/postgresql/data
     networks:
-      default:
+      - internal
 volumes:
   telegram_db:
 
