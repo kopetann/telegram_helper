@@ -3,8 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Config } from './common/config';
 import { ConfigModule } from '@nestjs/config';
+import { DatabaseConfig } from './common/database.config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -12,8 +13,10 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: () => new Config().getTypeOrmConfig(),
+      imports: undefined,
+      useClass: DatabaseConfig,
     }),
+    AuthModule,
     UserModule,
   ],
   controllers: [AppController],
