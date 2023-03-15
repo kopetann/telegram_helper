@@ -1,4 +1,11 @@
-import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
@@ -31,4 +38,9 @@ export class CreateUserDto {
   @IsPhoneNumber('RU')
   @IsNotEmpty()
   phoneNumber: string;
+
+  @ApiProperty()
+  @IsUUID('all', { each: true })
+  @IsOptional()
+  botsIds?: string[];
 }

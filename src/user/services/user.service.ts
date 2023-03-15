@@ -68,11 +68,7 @@ export class UserService {
   public async deleteUser(id: string): Promise<boolean> {
     try {
       const user = await this.findUserById(id);
-      if (await this.userRepository.remove(user)) {
-        return true;
-      } else {
-        return false;
-      }
+      return !!(await this.userRepository.remove(user));
     } catch (e) {
       throw new InternalServerErrorException(`Error deleting user: ${e}`);
     }

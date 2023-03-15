@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Request,
@@ -14,6 +15,7 @@ import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create.user.dto';
 import { UpdateUserDto } from '../dto/update.user.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt.auth.guard';
+import { CanUserEditGuard } from '../../common/guards/can.user.edit.guard';
 
 @Controller('user')
 export class UserController {
@@ -22,12 +24,13 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('my')
   public getMyProfile(@Request() req: any) {
+    req.user.password.remove();
     return req.user;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  public getUserById(@Param('id') id: string): Promise<User> {
+  public getUserById(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
     return this.userService.findUserById(id);
   }
 
@@ -42,18 +45,18 @@ export class UserController {
     return await this.userService.getUsers();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, CanUserEditGuard)
   @Patch(':id')
   public updateUser(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     return this.userService.updateUser(id, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, CanUserEditGuard)
   @Delete(':id')
-  public deleteUser(@Param('id') id: string): Promise<boolean> {
+  public deleteUser(@Param('id', ParseUUIDPipe) id: string): Promise<boolean> {
     return this.userService.deleteUser(id);
   }
 }
