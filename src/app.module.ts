@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseConfig } from './common/database.config';
 import { AuthModule } from './auth/auth.module';
+import { BotModule } from './bot/bot.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     AuthModule,
     UserModule,
+    BotModule,
   ],
   controllers: [AppController],
   providers: [AppService],
