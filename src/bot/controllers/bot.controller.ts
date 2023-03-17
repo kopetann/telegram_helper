@@ -14,6 +14,7 @@ import { CreateBotDto } from '../dto/create.bot.dto';
 import { UpdateBotDto } from '../dto/update.bot.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt.auth.guard';
 import { MessageService } from '../services/message.service';
+import { SendMessageDto } from '../dto/send.message.dto';
 
 @Controller('bot')
 @UseGuards(JwtAuthGuard)
@@ -23,9 +24,9 @@ export class BotController {
     private readonly messageService: MessageService,
   ) {}
 
-  @Get('message/send')
-  public async sendMessage() {
-    return this.messageService.sendMessage(['chatId'], 'botId');
+  @Post('message/send')
+  public async sendMessage(@Body() sendMessageDto: SendMessageDto) {
+    return this.messageService.sendMessage(sendMessageDto);
   }
 
   @Get('byName/:name')

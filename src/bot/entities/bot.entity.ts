@@ -1,8 +1,8 @@
 import { CommonEntity } from '../../common/entities/common.entity';
 import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { Config } from '../../common/config';
 import { User } from '../../user/entities/user.entity';
+import { encryptData } from '../../common/utils/encryption';
+import { InternalServerErrorException } from '@nestjs/common';
 
 @Entity('bots')
 export class Bot extends CommonEntity {
@@ -18,6 +18,10 @@ export class Bot extends CommonEntity {
   @BeforeInsert()
   @BeforeUpdate()
   async hashToken() {
-    this.token = await bcrypt.hash(this.token, new Config().get('SALT') ?? 10);
+    try {
+      this.token = encryptData(this.token);
+    } catch (e) {
+      throw new InternalServerErrorException(`Error encrypting token: ${e}`);
+    }
   }
 }
