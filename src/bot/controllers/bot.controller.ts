@@ -6,15 +6,27 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { BotService } from '../services/bot.service';
 import { Bot } from '../entities/bot.entity';
 import { CreateBotDto } from '../dto/create.bot.dto';
 import { UpdateBotDto } from '../dto/update.bot.dto';
+import { JwtAuthGuard } from '../../auth/guards/jwt.auth.guard';
+import { MessageService } from '../services/message.service';
 
 @Controller('bot')
+@UseGuards(JwtAuthGuard)
 export class BotController {
-  constructor(private readonly botService: BotService) {}
+  constructor(
+    private readonly botService: BotService,
+    private readonly messageService: MessageService,
+  ) {}
+
+  @Get('message/send')
+  public async sendMessage() {
+    return this.messageService.sendMessage(['chatId'], 'botId');
+  }
 
   @Get('byName/:name')
   public async findBotByName(name: string): Promise<Bot> {

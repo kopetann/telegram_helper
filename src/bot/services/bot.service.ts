@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Bot } from '../entities/bot.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateBotDto } from '../dto/create.bot.dto';
@@ -47,6 +47,15 @@ export class BotService {
     }
 
     return bot;
+  }
+
+  public async findBotsByIds(ids: string[]): Promise<Bot[]> {
+    return await this.botRepository.find({
+      where: { id: In(ids) },
+      relations: {
+        user: true,
+      },
+    });
   }
 
   public async createBot(createBotDto: CreateBotDto): Promise<Bot> {

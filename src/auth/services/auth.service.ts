@@ -34,7 +34,6 @@ export class AuthService {
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
     };
-    console.log(this.jwtService);
     return {
       token: this.jwtService.sign(payload),
     };

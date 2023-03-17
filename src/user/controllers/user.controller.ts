@@ -23,9 +23,11 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('my')
-  public getMyProfile(@Request() req: any) {
-    req.user.password.remove();
-    return req.user;
+  public getMyProfile(@Request() req: any): Promise<User> {
+    return this.userService.findUserById(req.user.id).then((res) => {
+      res.password = '******';
+      return res;
+    });
   }
 
   @UseGuards(JwtAuthGuard)
