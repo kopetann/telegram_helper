@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class SendMessageDto {
   @ApiProperty()
-  @IsUUID('all', { each: true })
+  @IsString({ each: true })
   @IsNotEmpty()
   chatIds: string[];
 
