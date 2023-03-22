@@ -2,6 +2,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { In, Repository } from 'typeorm';
@@ -10,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateBotDto } from '../dto/create.bot.dto';
 import { UserService } from '../../user/services/user.service';
 import { UpdateBotDto } from '../dto/update.bot.dto';
+import { Telegraf } from 'telegraf';
 
 @Injectable()
 export class BotService {
@@ -22,6 +24,23 @@ export class BotService {
 
   public async getBots(): Promise<Bot[]> {
     return await this.botRepository.find();
+  }
+
+  public async getMyBots(userId: string): Promise<Bot[]> {
+    return this.botRepository.find({
+      where: {
+        userId,
+      },
+    });
+  }
+
+  public async getChatsFromUpdate(botId: string): Promise<Record<string, any>> {
+    try {
+      const telegraf = new Telegraf(botId);
+      return await telegraf.telegram.getUpdates(-1, 100, 0, ['chat_member']);
+    } catch (e) {
+      throw new InternalServerErrorException(``);
+    }
   }
 
   public async findBotByName(name: string): Promise<Bot> {
