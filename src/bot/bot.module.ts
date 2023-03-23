@@ -5,9 +5,14 @@ import { BotController } from './controllers/bot.controller';
 import { BotService } from './services/bot.service';
 import { UserModule } from '../user/user.module';
 import { MessageService } from './services/message.service';
+import { ChannelModule } from '../channel/channel.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Bot]), forwardRef(() => UserModule)],
+  imports: [
+    TypeOrmModule.forFeature([Bot]),
+    forwardRef(() => UserModule),
+    ChannelModule,
+  ],
   controllers: [BotController],
   providers: [BotService, MessageService],
   exports: [BotService, MessageService],

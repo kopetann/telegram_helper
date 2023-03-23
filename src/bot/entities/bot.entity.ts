@@ -31,7 +31,7 @@ export class Bot extends CommonEntity {
 
   @BeforeInsert()
   @BeforeUpdate()
-  async hashToken() {
+  private hashToken() {
     try {
       this.token = encryptData(this.token);
     } catch (e) {

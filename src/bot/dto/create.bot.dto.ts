@@ -15,5 +15,5 @@ export class CreateBotDto {
   @ApiProperty()
   @IsUUID()
   @IsNotEmpty()
-  userId: string | undefined;
+  userId: string;
 }

@@ -12,6 +12,11 @@ import { CreateBotDto } from '../dto/create.bot.dto';
 import { UserService } from '../../user/services/user.service';
 import { UpdateBotDto } from '../dto/update.bot.dto';
 import { Telegraf } from 'telegraf';
+import { decryptData } from '../../common/utils/encryption';
+import { TelegramUpdate } from '../interfaces/telegram.update.interface';
+import { ChannelService } from '../../channel/services/channel.service';
+import { AddChannelDto } from '../../channel/dto/add.channel.dto';
+import { AddChannelResponse } from '../../channel/interfaces/add.channel.response.interface';
 
 @Injectable()
 export class BotService {
@@ -20,6 +25,7 @@ export class BotService {
     private readonly botRepository: Repository<Bot>,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+    private readonly channelService: ChannelService,
   ) {}
 
   public async getBots(): Promise<Bot[]> {
@@ -34,12 +40,33 @@ export class BotService {
     });
   }
 
-  public async getChatsFromUpdate(botId: string): Promise<Record<string, any>> {
+  public async getChatsFromUpdate(
+    userId: string,
+    botId: string,
+  ): Promise<AddChannelResponse> {
     try {
-      const telegraf = new Telegraf(botId);
-      return await telegraf.telegram.getUpdates(-1, 100, 0, ['chat_member']);
+      const bot = await this.findBotById(botId);
+      const telegraf = new Telegraf(decryptData(bot.token));
+      const channels: AddChannelDto[] = [];
+      let update: TelegramUpdate;
+
+      // @ts-ignore - there is some kind of mess with types - ask boss about this
+      for (update of await telegraf.telegram.getUpdates(-1, 100, 0, [
+        'chat_member',
+      ])) {
+        if (update.chat_member.new_chat_member.status === 'left') {
+          continue;
+        }
+
+        channels.push({
+          channelId: update.chat_member.chat.id,
+          name: update.chat_member.chat.title,
+        });
+      }
+
+      return await this.channelService.addChannels(userId, channels);
     } catch (e) {
-      throw new InternalServerErrorException(``);
+      throw new InternalServerErrorException(`Error getting chats: ${e}`);
     }
   }
 
@@ -81,8 +108,7 @@ export class BotService {
     try {
       const bot = this.botRepository.create({ ...createBotDto });
 
-      if (createBotDto.userId)
-        bot.user = await this.userService.findUserById(createBotDto.userId);
+      bot.user = await this.userService.findUserById(createBotDto.userId);
 
       return await this.botRepository.save(bot);
     } catch (error: any) {
@@ -95,11 +121,9 @@ export class BotService {
       const bot = await this.findBotById(id);
       if (updateBotDto.userId)
         bot.user = await this.userService.findUserById(updateBotDto.userId);
-      return await this.botRepository.save({
-        ...bot,
-        name: updateBotDto.name,
-        token: updateBotDto.token,
-      });
+
+      Object.assign(bot, updateBotDto);
+      return await this.botRepository.save(bot);
     } catch (error: any) {
       throw new Error(`Error during bot update: ${error.message}`);
     }

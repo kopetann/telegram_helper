@@ -16,7 +16,9 @@ export class MessageService {
     const telegraf = new Telegraf(botToken);
     for (const chatId of sendMessageDto.chatIds) {
       await telegraf.telegram.sendMessage(chatId, sendMessageDto.message).then(
-        () => {},
+        (value) => {
+          return value.chat.id;
+        },
         (error) => {
           throw new InternalServerErrorException(
             `Error sending message: ${error}`,

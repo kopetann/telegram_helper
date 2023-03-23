@@ -15,6 +15,8 @@ import { UpdateBotDto } from '../dto/update.bot.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt.auth.guard';
 import { MessageService } from '../services/message.service';
 import { SendMessageDto } from '../dto/send.message.dto';
+import { ExtractUser } from '../../user/decorators/extract.user.decorator';
+import { User } from '../../user/entities/user.entity';
 
 @Controller('bot')
 @UseGuards(JwtAuthGuard)
@@ -24,36 +26,44 @@ export class BotController {
     private readonly messageService: MessageService,
   ) {}
 
+  @Post('my/channels/update')
+  public updateChannels(
+    @ExtractUser() user: User,
+    @Body('id', ParseUUIDPipe) botId: string,
+  ) {
+    return this.botService.getChatsFromUpdate(user.id, botId);
+  }
+
   @Post('message/send')
-  public async sendMessage(@Body() sendMessageDto: SendMessageDto) {
+  public sendMessage(@Body() sendMessageDto: SendMessageDto) {
     return this.messageService.sendMessage(sendMessageDto);
   }
 
   @Get('byName/:name')
-  public async findBotByName(name: string): Promise<Bot> {
-    return await this.botService.findBotByName(name);
+  public findBotByName(name: string): Promise<Bot> {
+    return this.botService.findBotByName(name);
   }
 
   @Get('byId/:id')
-  public async findBotById(id: string): Promise<Bot> {
-    return await this.botService.findBotById(id);
-  }
-
-  @Get()
-  public async getBots(): Promise<Bot[]> {
-    return await this.botService.getBots();
-  }
-
-  @Post()
-  public async createBot(@Body() createBotDto: CreateBotDto): Promise<Bot> {
-    return await this.botService.createBot(createBotDto);
+  public findBotById(id: string): Promise<Bot> {
+    return this.botService.findBotById(id);
   }
 
   @Patch(':id')
-  public async updateBot(
+  public updateBot(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateBotDto: UpdateBotDto,
   ): Promise<Bot> {
-    return await this.botService.updateBot(id, updateBotDto);
+    return this.botService.updateBot(id, updateBotDto);
+  }
+
+  @Get()
+  public getBots(): Promise<Bot[]> {
+    return this.botService.getBots();
+  }
+
+  @Post()
+  public createBot(@Body() createBotDto: CreateBotDto): Promise<Bot> {
+    return this.botService.createBot(createBotDto);
   }
 }
