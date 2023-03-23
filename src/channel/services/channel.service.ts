@@ -52,6 +52,14 @@ export class ChannelService {
     }
   }
 
+  public async findByExtId(externalId: string): Promise<Channel | null> {
+    return await this.channelRepository.findOne({
+      where: {
+        externalId,
+      },
+    });
+  }
+
   public async getByUser(userId: string): Promise<Channel[]> {
     return await this.channelRepository.find({
       where: { userId },
